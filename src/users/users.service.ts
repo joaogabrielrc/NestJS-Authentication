@@ -1,5 +1,4 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { User } from './interfaces/user';
 
 const users: User[] = [
   {
