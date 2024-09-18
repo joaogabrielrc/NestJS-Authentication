@@ -34,4 +34,13 @@ export class AuthController {
   public async getUserPayload(@Req() request: Request) {
     return request.user;
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('/logout')
+  public async logout(
+    @Res() response: Response,
+  ): Promise<Response<{ message: string }>> {
+    response.clearCookie('access_token');
+    return response.send({ message: 'Logged out successfully' });
+  }
 }
