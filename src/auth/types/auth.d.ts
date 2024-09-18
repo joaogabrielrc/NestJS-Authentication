@@ -1,21 +1,21 @@
-type UserPayload = {
-  sub: number;
-  email: string;
-  accessToken: string;
-};
-
 type AuthInput = {
   email: string;
   password: string;
 };
 
-type SignInData = {
+type UserPayload = {
+  id: number;
+  email: string;
+};
+
+type AuthResult = {
   userId: number;
   email: string;
+  accessToken: string;
 };
 
 declare namespace Express {
   export interface Request {
-    user: omit<'accessToken', UserPayload>;
+    user: UserPayload;
   }
 }

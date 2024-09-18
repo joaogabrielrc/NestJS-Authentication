@@ -11,20 +11,26 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  public async authenticate(input: AuthInput): Promise<UserPayload> {
+  public async authenticate(input: AuthInput): Promise<AuthResult> {
     const userPayload = await this.validateUser(input);
 
     if (!userPayload) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return await this.signIn(userPayload);
+    const accessToken = await this.signIn(userPayload);
+
+    return {
+      userId: userPayload.id,
+      email: userPayload.email,
+      accessToken,
+    };
   }
 
   private async validateUser({
     email,
     password,
-  }: AuthInput): Promise<SignInData | null> {
+  }: AuthInput): Promise<UserPayload | null> {
     const user = await this.usersService
       .findOneByEmail(email)
       .catch(() => null);
@@ -35,21 +41,15 @@ export class AuthService {
     }
 
     return {
-      userId: user.id,
+      id: user.id,
       email: user.email,
     };
   }
 
-  private async signIn(payload: SignInData): Promise<UserPayload> {
-    const accessToken = await this.jwtService.signAsync({
-      sub: payload.userId,
-      email: payload.email,
+  private async signIn(userPayload: UserPayload): Promise<string> {
+    return await this.jwtService.signAsync({
+      sub: userPayload.id,
+      email: userPayload.email,
     });
-
-    return {
-      sub: payload.userId,
-      email: payload.email,
-      accessToken,
-    };
   }
 }
