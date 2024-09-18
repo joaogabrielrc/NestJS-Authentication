@@ -1,4 +1,4 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 
@@ -11,23 +11,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  public async authenticate(input: AuthInput): Promise<AuthResult> {
-    const userPayload = await this.validateUser(input);
-
-    if (!userPayload) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    const accessToken = await this.signIn(userPayload);
-
-    return {
-      userId: userPayload.id,
-      email: userPayload.email,
-      accessToken,
-    };
-  }
-
-  private async validateUser({
+  public async validateUser({
     email,
     password,
   }: AuthInput): Promise<UserPayload | null> {
@@ -35,7 +19,12 @@ export class AuthService {
       .findOneByEmail(email)
       .catch(() => null);
 
-    if (!user || user.password !== password) {
+    if (!user) {
+      this.logger.error('User not found');
+      return null;
+    }
+
+    if (user.password !== password) {
       this.logger.error('Invalid password attempt');
       return null;
     }
@@ -46,7 +35,7 @@ export class AuthService {
     };
   }
 
-  private async signIn(userPayload: UserPayload): Promise<string> {
+  public async signIn(userPayload: UserPayload): Promise<string> {
     return await this.jwtService.signAsync({
       sub: userPayload.id,
       email: userPayload.email,
