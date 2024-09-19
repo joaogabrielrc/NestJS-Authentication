@@ -55,6 +55,22 @@ export class AuthService {
     };
   }
 
+  public async veryifyUserEmail(email: string): Promise<UserPayload | null> {
+    const user = await this.usersService
+      .findOneByEmail(email)
+      .catch(() => null);
+
+    if (!user) {
+      this.logger.error('User not found');
+      return null;
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+    };
+  }
+
   public async signIn(userPayload: UserPayload): Promise<{
     accessToken: string;
     refreshToken: string;
