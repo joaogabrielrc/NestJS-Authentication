@@ -10,6 +10,8 @@ describe('UsersService', () => {
       providers: [UsersService],
     }).compile();
 
+    module.useLogger(false);
+
     service = module.get<UsersService>(UsersService);
   });
 

@@ -32,6 +32,8 @@ describe('AuthController', () => {
       .useValue({ canActivate: jest.fn(() => true) })
       .compile();
 
+    moduleRef.useLogger(false);
+
     app = moduleRef.createNestApplication();
     await app.init();
   });

@@ -34,6 +34,8 @@ describe('AuthService', () => {
       ],
     }).compile();
 
+    module.useLogger(false);
+
     authService = module.get<AuthService>(AuthService);
     usersService = module.get<UsersService>(UsersService);
   });
