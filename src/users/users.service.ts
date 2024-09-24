@@ -1,4 +1,5 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { LoggerService } from 'src/core/logger/logger.service';
 
 const users: User[] = [
   {
@@ -17,12 +18,14 @@ const users: User[] = [
 
 @Injectable()
 export class UsersService {
-  private readonly logger = new Logger(UsersService.name);
+  constructor(private readonly loggerService: LoggerService) {
+    this.loggerService.setContext(UsersService.name);
+  }
 
   public async findOneByEmail(email: string): Promise<User> {
     const user = users.find((user) => user.email === email);
     if (!user) {
-      this.logger.error(`User not found by email: ${email}`);
+      this.loggerService.error(`User not found by email: ${email}`);
       throw new NotFoundException('User not found by email');
     }
     return user;
@@ -36,7 +39,7 @@ export class UsersService {
       (user) => user.id === id && user.refreshToken === refreshToken,
     );
     if (!user) {
-      this.logger.error(`User not found by id: ${id} and refresh token`);
+      this.loggerService.error(`User not found by id: ${id} and refresh token`);
       throw new NotFoundException('User not found by id and refresh token');
     }
     return user;
@@ -48,7 +51,7 @@ export class UsersService {
   ): Promise<void> {
     const user = users.find((user) => user.id === id);
     if (!user) {
-      this.logger.error(`User not found by id: ${id}`);
+      this.loggerService.error(`User not found by id: ${id}`);
       throw new NotFoundException('User not found by id');
     }
     user.refreshToken = refreshToken;

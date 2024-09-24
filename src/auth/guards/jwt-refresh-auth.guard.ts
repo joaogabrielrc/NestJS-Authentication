@@ -1,13 +1,16 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { LoggerService } from 'src/core/logger/logger.service';
 
 @Injectable()
 export class PassportJwtRefreshAuthGuard extends AuthGuard('jwt-refresh') {
-  private readonly logger = new Logger(PassportJwtRefreshAuthGuard.name);
+  constructor(private readonly loggerService: LoggerService) {
+    super();
+  }
 
   public handleRequest(error: any, user: any, info: any) {
     if (error || !user) {
-      this.logger.error(info);
+      this.loggerService.error(info);
       throw error || new UnauthorizedException('Invalid Refresh Token');
     }
     return user;

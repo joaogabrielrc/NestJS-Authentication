@@ -1,16 +1,19 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { LoggerService } from 'src/core/logger/logger.service';
 
 @Injectable()
 export class PassportLocalGuard extends AuthGuard('local') {
-  private readonly logger = new Logger(PassportLocalGuard.name);
+  constructor(private readonly loggerService: LoggerService) {
+    super();
+  }
 
   public handleRequest(error: Error, user: any): any {
     if (error || !user) {
-      this.logger.error(error);
+      this.loggerService.error(error);
       throw error || new Error('User not authenticated');
     }
-    this.logger.log('User authenticated: ' + user.email);
+    this.loggerService.log('User authenticated: ' + user.email);
     return user;
   }
 }

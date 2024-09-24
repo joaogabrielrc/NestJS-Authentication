@@ -3,6 +3,7 @@ import { AuthService } from '../src/auth/auth.service';
 import { UsersService } from '../src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { NotFoundException } from '@nestjs/common';
+import { LoggerService } from 'src/core/logger/logger.service';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -31,10 +32,15 @@ describe('AuthService', () => {
         AuthService,
         { provide: UsersService, useValue: mockUsersService },
         { provide: JwtService, useValue: mockJwtService },
+        {
+          provide: LoggerService,
+          useValue: {
+            setContext: jest.fn(),
+            error: jest.fn(),
+          },
+        },
       ],
     }).compile();
-
-    module.useLogger(false);
 
     authService = module.get<AuthService>(AuthService);
     usersService = module.get<UsersService>(UsersService);

@@ -1,16 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from '../src/users/users.service';
 import { NotFoundException } from '@nestjs/common';
+import { LoggerService } from 'src/core/logger/logger.service';
 
 describe('UsersService', () => {
   let service: UsersService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UsersService],
+      providers: [
+        UsersService,
+        {
+          provide: LoggerService,
+          useValue: {
+            setContext: jest.fn(),
+            error: jest.fn(),
+          },
+        },
+      ],
     }).compile();
-
-    module.useLogger(false);
 
     service = module.get<UsersService>(UsersService);
   });

@@ -1,16 +1,18 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './config/constants';
+import { LoggerService } from 'src/core/logger/logger.service';
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
-
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-  ) {}
+    private readonly loggerService: LoggerService,
+  ) {
+    this.loggerService.setContext(AuthService.name);
+  }
 
   public async validateUser({
     email,
@@ -21,12 +23,12 @@ export class AuthService {
       .catch(() => null);
 
     if (!user) {
-      this.logger.error('User not found');
+      this.loggerService.error('User not found');
       return null;
     }
 
     if (user.password !== password) {
-      this.logger.error('Invalid password attempt');
+      this.loggerService.error('Invalid password attempt');
       return null;
     }
 
@@ -45,7 +47,7 @@ export class AuthService {
       .catch(() => null);
 
     if (!user) {
-      this.logger.error('User not found');
+      this.loggerService.error('User not found');
       return null;
     }
 
@@ -61,7 +63,7 @@ export class AuthService {
       .catch(() => null);
 
     if (!user) {
-      this.logger.error('User not found');
+      this.loggerService.error('User not found');
       return null;
     }
 
